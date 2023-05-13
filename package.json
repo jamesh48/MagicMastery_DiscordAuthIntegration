@@ -1,0 +1,32 @@
+{
+  "name": "discord_chatbot_mm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc --watch & nodemon ./dist/bot.js",
+    "start:prod": "node ./dist/bot.js",
+    "build": "tsc",
+    "docker:build": "docker build -t mm-auth-service .",
+    "docker:start": "docker run -p 3000:3000 mm-auth-service"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.21.8",
+    "@babel/preset-env": "^7.21.5",
+    "@babel/preset-react": "^7.18.6",
+    "body-parser": "^1.20.2",
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "typescript": "^5.0.4"
+  },
+  "devDependencies": {
+    "@types/babel__core": "^7.20.0",
+    "@types/ejs": "^3.1.2",
+    "@types/express": "^4.17.17"
+  }
+}
