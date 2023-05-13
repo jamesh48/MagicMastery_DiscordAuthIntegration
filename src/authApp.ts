@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import generateAuthHtml from './static/authTemplate';
+import { acmpReq } from './acmpUtils';
 
 const app = express();
 const jsonParser = bodyParser.json();
@@ -56,11 +57,47 @@ app.get('/authCode', async (req, res) => {
 });
 
 app.post('/acmpActivate', jsonParser, async (req, res) => {
+  // Validate that the inputs are present
+  if (!req.body.discordId || !req.body.email) {
+    return res.status(400).send('Bad Request');
+  }
   const { discordId, email } = req.body;
+  const { contacts } = await acmpReq({
+    method: 'GET',
+    dataOrParams: { email },
+    endpoint: 'contacts',
+  });
+  // validate that the email is found, send 404 otherwise
+  if (!contacts.length) {
+    return res.status(404).send('Email not found');
+  }
 
-  console.info(discordId, email);
-  // post details to active campaign
-  res.send('ok');
+  const [{ id }] = contacts;
+
+  const { fields } = await acmpReq({
+    method: 'GET',
+    endpoint: 'fields',
+    dataOrParams: { limit: 100 },
+  });
+
+  let discordIdFieldId = '';
+  for (let i = 0; i < fields.length; i++) {
+    if (fields[i].title === 'Discord ID') {
+      discordIdFieldId = fields[i].id;
+    }
+  }
+
+  await acmpReq({
+    method: 'PUT',
+    endpoint: `contacts/${id}`,
+    dataOrParams: {
+      contact: {
+        fieldValues: [{ field: discordIdFieldId, value: discordId }],
+      },
+    },
+  });
+
+  return res.send('ok');
 });
 
 export default app;

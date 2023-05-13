@@ -10,6 +10,14 @@ export class MmIacStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    if (!process.env.ACTIVE_CAMPAIGN_API_TOKEN) {
+      throw new Error('ACTIVE_CAMPAIGN_API_TOKEN env is not Defined!');
+    }
+
+    if (!process.env.ACTIVE_CAMPAIGN_BASEURL) {
+      throw new Error('ACTIVE_CAMPAIGN_BASEURL env is not Defined!');
+    }
+
     if (!process.env.DISCORD_CLIENT_ID) {
       throw new Error('DISCORD_CLIENT_ID env is not Defined!');
     }
@@ -62,6 +70,8 @@ export class MmIacStack extends cdk.Stack {
         containerPort: Number(process.env.EXPRESS_SERVER_PORT),
         containerName: 'mm-auth-container',
         environment: {
+          ACTIVE_CAMPAIGN_API_TOKEN: process.env.ACTIVE_CAMPAIGN_API_TOKEN,
+          ACTIVE_CAMPAIGN_BASEURL: process.env.ACTIVE_CAMPAIGN_BASEURL,
           DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN,
           DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
           DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
