@@ -1,7 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: './.env' });
+//
 import express from 'express';
 import bodyParser from 'body-parser';
 import generateAuthHtml from './static/authTemplate';
 import { acmpReq } from './acmpUtils';
+import { validateDiscordUser } from './discordUtils';
 
 const app = express();
 const jsonParser = bodyParser.json();
@@ -46,7 +50,6 @@ app.get('/authCode', async (req, res) => {
 
   console.info('\n\n<--- USER RESULT --->\n\n');
   const candidateUser = await userResult.json();
-
   const { id: discordId, email } = candidateUser;
   console.info(discordId, email);
 
@@ -58,10 +61,28 @@ app.get('/authCode', async (req, res) => {
 
 app.post('/acmpActivate', jsonParser, async (req, res) => {
   // Validate that the inputs are present
-  if (!req.body.discordId || !req.body.email) {
-    return res.status(400).send('Bad Request');
+  if (!req.body.discordId) {
+    return res.status(400).json({ error: 'Bad Request' });
   }
+
+  if (!req.body.email) {
+    return res.status(400).json({ error: 'Please include Email' });
+  }
+
+  // Discord Token Request has expired after 5 minutes
+  if (req.body.discordId === 'undefined') {
+    return res
+      .status(400)
+      .json({ error: 'Expired Request, please reauthenticate.' });
+  }
+
   const { discordId, email } = req.body;
+  // Validate that the user exists in Discord at all
+  const verifiedUser = await validateDiscordUser(discordId);
+  if (!verifiedUser) {
+    return res.status(403).json({ error: 'Unauthorized Request' });
+  }
+
   const { contacts } = await acmpReq({
     method: 'GET',
     dataOrParams: { email },
@@ -69,7 +90,9 @@ app.post('/acmpActivate', jsonParser, async (req, res) => {
   });
   // validate that the email is found, send 404 otherwise
   if (!contacts.length) {
-    return res.status(404).send('Email not found');
+    return res.status(404).json({
+      error: 'Email not found, did you use the email you registered with?',
+    });
   }
 
   const [{ id }] = contacts;
@@ -100,4 +123,8 @@ app.post('/acmpActivate', jsonParser, async (req, res) => {
   return res.send('ok');
 });
 
-export default app;
+app.listen(process.env.EXPRESS_SERVER_PORT, () =>
+  console.info(
+    `DiscordBot-MM listening on Port ${process.env.EXPRESS_SERVER_PORT}`
+  )
+);

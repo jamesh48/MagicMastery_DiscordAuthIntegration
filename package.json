@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc --watch & nodemon ./dist/bot.js",
-    "start:prod": "node ./dist/bot.js",
+    "dev": "tsc --watch & nodemon ./dist/authApp.js",
+    "start:prod": "node ./dist/authApp.js",
     "build": "tsc",
     "docker:build": "docker build -t mm-auth-service .",
     "docker:start": "docker run -p 3000:3000 mm-auth-service"

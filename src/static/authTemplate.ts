@@ -82,6 +82,8 @@ export default (
 
       .status-error {
         color: #f44336;
+        text-align: center;
+        margin-top: 1rem;
       }
 
       @media only screen and (max-width: 480px) {
@@ -116,11 +118,11 @@ export default (
               setStatusMessage('Email submitted successfully!');
               window.location.replace('https://discord.com/channels/${defaultChannelID}');
             } else {
-              setStatusMessage('Email submission failed.');
+              setStatusMessage(response.data.error);
             }
           } catch (error) {
-            console.error(error);
-            setStatusMessage('An error occurred while submitting the email.');
+            console.error(error.response.data);
+            setStatusMessage(error.response.data.error);
           }
         };
 
