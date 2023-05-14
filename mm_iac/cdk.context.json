@@ -10,5 +10,17 @@
   "hosted-zone:account=471507967541:domainName=magicmastery-auth.com:region=us-east-1": {
     "Id": "/hostedzone/Z08298561MAXD5JQE4ASL",
     "Name": "magicmastery-auth.com."
-  }
+  },
+  "hosted-zone:account=036663905174:domainName=magicmastery-auth.com:region=us-east-1": {
+    "Id": "/hostedzone/Z09629742TSHEJ0P6IY44",
+    "Name": "magicmastery-auth.com."
+  },
+  "availability-zones:account=036663905174:region=us-east-1": [
+    "us-east-1a",
+    "us-east-1b",
+    "us-east-1c",
+    "us-east-1d",
+    "us-east-1e",
+    "us-east-1f"
+  ]
 }

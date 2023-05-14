@@ -7,9 +7,9 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "jest",
     "cdk": "cdk",
-    "deploy:local": "DOCKER_DEFAULT_PLATFORM=linux/amd64 cdk deploy"
+    "deploy:local:dev": "DOCKER_DEFAULT_PLATFORM=linux/amd64 cdk deploy",
+    "deploy:local:prd": "DOCKER_DEFAULT_PLATFORM=linux/amd64 cdk deploy --profile ProductionAccount"
   },
   "devDependencies": {
     "@types/jest": "^29.4.0",
