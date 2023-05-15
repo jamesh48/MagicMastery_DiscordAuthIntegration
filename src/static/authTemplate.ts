@@ -78,6 +78,8 @@ export default (
 
       .status-success {
         color: #4caf50;
+        text-align: center;
+        margin-top: 1rem;
       }
 
       .status-error {
@@ -115,7 +117,12 @@ export default (
             });
 
             if (response.status === 200) {
-              setStatusMessage('Email submitted successfully!');
+              setStatusMessage('Email submitted successfully! You will be redirected in 5 seconds...');
+              await new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve('ok');
+                }, 5000);
+              });
               window.location.replace('https://discord.com/channels/${defaultChannelID}');
             } else {
               setStatusMessage(response.data.error);
