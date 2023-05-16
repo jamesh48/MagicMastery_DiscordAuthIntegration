@@ -117,13 +117,14 @@ export default (
             });
 
             if (response.status === 200) {
-              setStatusMessage('Email submitted successfully! You will be redirected in 5 seconds...');
+              setStatusMessage('Email submitted successfully! You can close this window now.');
               await new Promise((resolve) => {
                 setTimeout(() => {
                   resolve('ok');
                 }, 5000);
               });
-              window.location.replace('discord://app/channels/${defaultChannelID}');
+
+              // window.location.replace('discord://app/channels/${defaultChannelID}');
             } else {
               setStatusMessage(response.data.error);
             }
