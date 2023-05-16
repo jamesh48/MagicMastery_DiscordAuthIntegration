@@ -53,10 +53,14 @@ app.get('/authCode', async (req, res) => {
   const { id: discordId, email } = candidateUser;
   console.info(discordId, email);
 
+  if (!discordId) {
+    return res.status(400).send('bad request');
+  }
+
   const baseUrl = process.env.MM_AUTH_URL;
   const defaultChannelID = process.env.DISCORD_DEFAULT_CHANNELID;
 
-  res.send(generateAuthHtml(discordId, baseUrl, defaultChannelID));
+  return res.send(generateAuthHtml(discordId, baseUrl, defaultChannelID));
 });
 
 app.post('/acmpActivate', jsonParser, async (req, res) => {
@@ -105,8 +109,22 @@ app.post('/acmpActivate', jsonParser, async (req, res) => {
 
   let discordIdFieldId = '';
   for (let i = 0; i < fields.length; i++) {
-    if (fields[i].title === 'Discord ID') {
+    if (fields[i].title === 'Discord Member ID') {
       discordIdFieldId = fields[i].id;
+    }
+  }
+
+  const { fieldValues } = await acmpReq({
+    endpoint: `contacts/${id}/fieldValues`,
+    dataOrParams: {},
+    method: 'GET',
+  });
+
+  for (let i = 0; i < fieldValues.length; i++) {
+    if (fieldValues[i].field === discordIdFieldId) {
+      if (fieldValues[i].value) {
+        return res.status(403).send({ error: 'User is already authorized' });
+      }
     }
   }
 

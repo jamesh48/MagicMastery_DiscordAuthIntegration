@@ -123,7 +123,7 @@ export default (
                   resolve('ok');
                 }, 5000);
               });
-              window.location.replace('https://discord.com/channels/${defaultChannelID}');
+              window.location.replace('discord://app/channels/${defaultChannelID}');
             } else {
               setStatusMessage(response.data.error);
             }
