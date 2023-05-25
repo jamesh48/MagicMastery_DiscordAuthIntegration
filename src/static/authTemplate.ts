@@ -151,8 +151,9 @@ export default (
           </form>
         );
       };
-
-      ReactDOM.render(<Form />, document.getElementById('root'));
+      const container = document.getElementById('root')
+      const root = ReactDOM.createRoot(container);
+      root.render(<Form tab="home" />);
     </script>
   </body>
 `;

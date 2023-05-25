@@ -59,8 +59,9 @@ app.get('/authCode', async (req, res) => {
 
   const baseUrl = process.env.MM_AUTH_URL;
   const defaultChannelID = process.env.DISCORD_DEFAULT_CHANNELID;
-
-  return res.send(generateAuthHtml(discordId, baseUrl, defaultChannelID));
+  return res
+    .status(200)
+    .send(generateAuthHtml(discordId, baseUrl, defaultChannelID));
 });
 
 app.post('/acmpActivate', jsonParser, async (req, res) => {
@@ -141,8 +142,4 @@ app.post('/acmpActivate', jsonParser, async (req, res) => {
   return res.send('ok');
 });
 
-app.listen(process.env.EXPRESS_SERVER_PORT, () =>
-  console.info(
-    `DiscordBot-MM listening on Port ${process.env.EXPRESS_SERVER_PORT}`
-  )
-);
+export default app;
