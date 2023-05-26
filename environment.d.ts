@@ -9,6 +9,7 @@ declare global {
       DISCORD_CLIENT_ID: string;
       DISCORD_CLIENT_SECRET: string;
       DISCORD_DEFAULT_CHANNELID: string;
+      DISCORD_MAIN_REGISTRATION_CHANNEL_ID: string;
       DISCORD_PARENT_REGISTRATION_CHANNEL: string;
       MM_AUTH_URL: string;
       MM_GUILD_ID: string;

@@ -1,5 +1,12 @@
 import axios from 'axios';
-import { ChannelType, Guild, TextChannel } from 'discord.js';
+import {
+  ChannelType,
+  Guild,
+  GuildMember,
+  Message,
+  PartialGuildMember,
+  TextChannel,
+} from 'discord.js';
 import * as EmailValidator from 'email-validator';
 
 export const createMaxChannel = async (theGuild: Guild, discordId: string) => {
@@ -50,7 +57,7 @@ export const registerEmail = async (
           return true;
         }
 
-        if (m.content.toLowerCase() === 'not now') {
+        if (m.content.toLowerCase() === 'exit') {
           return true;
         }
       }
@@ -62,9 +69,9 @@ export const registerEmail = async (
     return;
   }
 
-  if (collectedMessages.at(0)?.content.toLowerCase() === 'not now') {
+  if (collectedMessages.at(0)?.content.toLowerCase() === 'exit') {
     deleteChannel(theGuild, registrationChannel);
-    return;
+    return true;
   }
 
   const email = collectedMessages.at(0)?.content;
@@ -92,5 +99,55 @@ export const registerEmail = async (
       'Please try again'
     );
   }
-  return;
+  return true;
+};
+
+export const checkForExistingRegistrationChannel = (
+  member: GuildMember | PartialGuildMember
+) => {
+  return !!member.guild.channels.cache.find(
+    (channel) =>
+      channel.name.startsWith('registration-') &&
+      (channel as TextChannel).topic === member.id
+  );
+};
+
+export const deleteExpiredMsgs = async (guild: Guild, discordId: string) => {
+  const mainRegistrationChannel = guild.channels.cache.get(
+    process.env.DISCORD_MAIN_REGISTRATION_CHANNEL_ID
+  );
+
+  if (mainRegistrationChannel?.isTextBased()) {
+    const fetched = await mainRegistrationChannel?.messages.fetch({
+      limit: 100,
+    });
+    const deleteMsgPromiseArr = fetched.reduce((total, existingMsg) => {
+      if (
+        (existingMsg.member && existingMsg.member.id === discordId) ||
+        existingMsg.nonce === discordId
+      ) {
+        const deletionPromise = existingMsg.delete();
+        total.push(deletionPromise);
+      }
+      return total;
+    }, [] as (Promise<Message<false>> | Promise<Message<true>>)[]);
+
+    await Promise.all(deleteMsgPromiseArr);
+  }
+};
+
+export const deleteIdleChannel = async (
+  member: GuildMember | PartialGuildMember
+) => {
+  const channelToDelete = member.guild.channels.cache.find(
+    (channel) =>
+      channel.name.startsWith('registration-') &&
+      (channel as TextChannel).topic === member.id
+  );
+
+  try {
+    await channelToDelete?.delete();
+  } catch (err) {
+    console.info('channel already deleted');
+  }
 };
