@@ -14,8 +14,15 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
+
+import {
+  emailTextInputCustomId,
+  registerMeButtonCustomId,
+  registerMeModalCustomId,
+  registerNewEmail,
+} from './utilities';
+
 import authApp from './authApp';
-import * as botUtils from './botUtils';
 
 const token = process.env.DISCORD_BOT_TOKEN;
 
@@ -38,7 +45,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   const modal = new ModalBuilder();
 
   const emailTextInput = new TextInputBuilder()
-    .setCustomId('register-me-input')
+    .setCustomId(emailTextInputCustomId)
     .setLabel('What is the email you registered with?')
     .setStyle(TextInputStyle.Short)
     .setPlaceholder('')
@@ -50,9 +57,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
     );
 
   if (interaction.isButton()) {
-    if (interaction.customId === 'magic-mastery-register-me-button') {
+    if (interaction.customId === registerMeButtonCustomId) {
       modal
-        .setCustomId('magic-mastery-register-me-email-modal')
+        .setCustomId(registerMeModalCustomId)
         .setTitle('Magic Mastery Email Registration')
         .addComponents([actionRowComponents]);
 
@@ -62,16 +69,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 
   if (interaction.isModalSubmit()) {
-    if (interaction.customId === 'magic-mastery-register-me-email-modal') {
-      const responseEmail =
-        interaction.fields.getTextInputValue('register-me-input');
+    if (interaction.customId === registerMeModalCustomId) {
+      const responseEmail = interaction.fields.getTextInputValue(
+        emailTextInputCustomId
+      );
 
       if (interaction.member) {
         const { id: discordId } = interaction.member.user;
-        const acmpResp = await botUtils.registerNewEmail(
-          responseEmail,
-          discordId
-        );
+        const acmpResp = await registerNewEmail(responseEmail, discordId);
 
         const tempErrMsg = await interaction.reply(acmpResp);
         await new Promise((resolve) => {
@@ -95,7 +100,7 @@ client.on('ready', async (c) => {
   let button = new ActionRowBuilder<ButtonBuilder>();
   button.addComponents(
     new ButtonBuilder()
-      .setCustomId('magic-mastery-register-me-button')
+      .setCustomId(registerMeButtonCustomId)
       .setStyle(ButtonStyle.Primary)
       .setLabel('Register Me')
   );
@@ -109,7 +114,7 @@ client.on('ready', async (c) => {
       if (firstMessageIsButton) {
         const firstMessageButtonCustomId = firstMessageComponents.customId;
         const buttonAlreadyExists =
-          firstMessageButtonCustomId === 'magic-mastery-register-me-button';
+          firstMessageButtonCustomId === registerMeButtonCustomId;
 
         if (buttonAlreadyExists) {
           return;

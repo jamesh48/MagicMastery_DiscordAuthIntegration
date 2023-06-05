@@ -3,43 +3,73 @@ dotenv.config({ path: './.env' });
 //
 import express from 'express';
 import bodyParser from 'body-parser';
-import { acmpReq } from './acmpUtils';
-import { validateDiscordUser } from './discordUtils';
-import { validateEmail } from './serverUtils';
+import {
+  validateDiscordUser,
+  acmpReq,
+  validateEmail,
+  sendResponse,
+} from './utilities';
 
 const app = express();
 const jsonParser = bodyParser.json();
 
 app.get('/healthcheck', async (_req, res) => {
-  res.send('App is Healthy!');
+  return sendResponse({
+    res,
+    statusCode: 200,
+    responseBody: { message: 'App is Healthy!' },
+  });
 });
 
 app.post('/acmpActivate', jsonParser, async (req, res) => {
   // Validate that the inputs are present
   if (!req.body.discordId) {
-    return res.status(400).json({ error: 'Bad Request' });
+    return sendResponse({
+      res,
+      statusCode: 400,
+      responseBody: {
+        error: 'Bad Request: Missing DiscordId, contact an Admin',
+      },
+    });
   }
 
   if (!req.body.email) {
-    return res.status(400).json({ error: 'Please include Email' });
+    return sendResponse({
+      res,
+      statusCode: 400,
+      responseBody: {
+        error: 'Please include Email',
+      },
+    });
   }
 
   if (!validateEmail(req.body.email)) {
-    return res.status(400).json({ error: 'Please include a valid email' });
+    return sendResponse({
+      res,
+      statusCode: 400,
+      responseBody: { error: 'Please include a valid emeail' },
+    });
   }
 
-  // Discord Token Request has expired after 5 minutes
   if (req.body.discordId === 'undefined') {
-    return res
-      .status(400)
-      .json({ error: 'Expired Request, please reauthenticate.' });
+    return sendResponse({
+      res,
+      statusCode: 400,
+      responseBody: {
+        error: 'Bad Request: undefined DiscordId, contact an Admin',
+      },
+    });
   }
 
   const { discordId, email } = req.body;
   // Validate that the user exists in Discord at all
   const verifiedUser = await validateDiscordUser(discordId);
   if (!verifiedUser) {
-    return res.status(403).json({ error: 'Unauthorized Request' });
+    return sendResponse({
+      res,
+      statusCode: 403,
+      responseBody: { error: 'Unauthorized Request' },
+    });
   }
 
   const { contacts } = await acmpReq({
@@ -49,8 +79,12 @@ app.post('/acmpActivate', jsonParser, async (req, res) => {
   });
   // validate that the email is found, send 404 otherwise
   if (!contacts.length) {
-    return res.status(404).json({
-      error: 'Email not found, did you use the email you registered with?',
+    return sendResponse({
+      res,
+      statusCode: 404,
+      responseBody: {
+        error: 'Email not found, did you use the email you registered with?',
+      },
     });
   }
 
@@ -78,7 +112,11 @@ app.post('/acmpActivate', jsonParser, async (req, res) => {
   for (let i = 0; i < fieldValues.length; i++) {
     if (fieldValues[i].field === discordIdFieldId) {
       if (fieldValues[i].value) {
-        return res.status(403).send({ error: 'User is already authorized' });
+        return sendResponse({
+          res,
+          statusCode: 403,
+          responseBody: { error: 'User is already authorized' },
+        });
       }
     }
   }
@@ -93,7 +131,11 @@ app.post('/acmpActivate', jsonParser, async (req, res) => {
     },
   });
 
-  return res.send('ok');
+  return sendResponse({
+    res,
+    statusCode: 200,
+    responseBody: { message: 'ok' },
+  });
 });
 
 export default app;
