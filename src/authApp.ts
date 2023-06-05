@@ -10,10 +10,6 @@ import { validateEmail } from './serverUtils';
 const app = express();
 const jsonParser = bodyParser.json();
 
-app.get('/ping', async (_req, res) => {
-  res.send('pong');
-});
-
 app.get('/healthcheck', async (_req, res) => {
   res.send('App is Healthy!');
 });
