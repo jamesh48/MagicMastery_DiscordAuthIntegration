@@ -6,6 +6,7 @@ import bodyParser from 'body-parser';
 import generateAuthHtml from './static/authTemplate';
 import { acmpReq } from './acmpUtils';
 import { validateDiscordUser } from './discordUtils';
+import { validateEmail } from './serverUtils';
 
 const app = express();
 const jsonParser = bodyParser.json();
@@ -72,6 +73,10 @@ app.post('/acmpActivate', jsonParser, async (req, res) => {
 
   if (!req.body.email) {
     return res.status(400).json({ error: 'Please include Email' });
+  }
+
+  if (!validateEmail(req.body.email)) {
+    return res.status(400).json({ error: 'Please include a valid email' });
   }
 
   // Discord Token Request has expired after 5 minutes
