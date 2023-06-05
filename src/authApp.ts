@@ -3,7 +3,6 @@ dotenv.config({ path: './.env' });
 //
 import express from 'express';
 import bodyParser from 'body-parser';
-import generateAuthHtml from './static/authTemplate';
 import { acmpReq } from './acmpUtils';
 import { validateDiscordUser } from './discordUtils';
 import { validateEmail } from './serverUtils';
@@ -58,11 +57,7 @@ app.get('/authCode', async (req, res) => {
     return res.status(400).send('bad request');
   }
 
-  const baseUrl = process.env.MM_AUTH_URL;
-  const defaultChannelID = process.env.DISCORD_DEFAULT_CHANNELID;
-  return res
-    .status(200)
-    .send(generateAuthHtml(discordId, baseUrl, defaultChannelID));
+  return res.status(200).send('ok');
 });
 
 app.post('/acmpActivate', jsonParser, async (req, res) => {
