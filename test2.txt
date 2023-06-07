@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "5"
+    meta.helm.sh/release-name: ccl-baggage-listener
+    meta.helm.sh/release-namespace: ccl-service
+  creationTimestamp: "2023-03-28T16:49:45Z"
+  generation: 5
+  labels:
+    app.kubernetes.io/instance: ccl-baggage-listener
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: service
+    helm.sh/chart: service-0.1.0
+  name: ccl-baggage-listener-service
+  namespace: ccl-service
+  resourceVersion: "42339962"
+  uid: 5cf81c72-076e-498f-9e4b-10cdf07204ae
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ccl-baggage-listener
+      app.kubernetes.io/name: service
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2023-06-06T23:17:08-05:00"
+        prometheus.io/scrape: "true"
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: ccl-baggage-listener
+        app.kubernetes.io/name: service
