@@ -94,7 +94,7 @@ client.on('ready', async (c) => {
   console.log(`Logged in as ${client.user?.tag}!`);
 
   const registrationChannel = c.channels.cache.get(
-    process.env.DISCORD_MAIN_REGISTRATION_CHANNEL_ID
+    process.env.DISCORD_REGISTRATION_CHANNEL_ID
   );
 
   let button = new ActionRowBuilder<ButtonBuilder>();
@@ -125,12 +125,6 @@ client.on('ready', async (c) => {
     await registrationChannel.send({
       components: [button],
     });
-  }
-
-  const theGuild = client.guilds.cache.get(process.env.MM_GUILD_ID);
-
-  if (!theGuild) {
-    return;
   }
 });
 

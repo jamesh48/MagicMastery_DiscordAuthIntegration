@@ -9,6 +9,7 @@ import { MmIacStackProps } from '../lib/types';
 
 const app = new cdk.App();
 
+console.info(process.env.CDK_DEFAULT_ACCOUNT);
 if (process.env.CDK_DEFAULT_ACCOUNT !== '036663905174') {
   throw new Error('Invalid Account');
 }

@@ -38,9 +38,7 @@ export class MmIacStack extends cdk.Stack {
       ACTIVE_CAMPAIGN_API_TOKEN,
       ACTIVE_CAMPAIGN_BASEURL,
       DISCORD_BOT_TOKEN,
-      DISCORD_CLIENT_ID,
-      DISCORD_CLIENT_SECRET,
-      DISCORD_DEFAULT_CHANNELID,
+      DISCORD_REGISTRATION_CHANNEL_ID,
       EXPRESS_SERVER_PORT,
       MM_AUTH_URL,
     } = this.getDefinedEnvVariables();
@@ -68,8 +66,8 @@ export class MmIacStack extends cdk.Stack {
     };
 
     const service = new MMAuthALB(this, 'mm-auth-service', {
-      cpu: 512,
-      memoryLimitMiB: 1024,
+      cpu: 256,
+      memoryLimitMiB: 512,
       ...(props.applyHttpsSettings ? httpsSettings : {}),
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset('../'),
@@ -80,9 +78,7 @@ export class MmIacStack extends cdk.Stack {
           ACTIVE_CAMPAIGN_API_TOKEN,
           ACTIVE_CAMPAIGN_BASEURL,
           DISCORD_BOT_TOKEN,
-          DISCORD_CLIENT_ID,
-          DISCORD_CLIENT_SECRET,
-          DISCORD_DEFAULT_CHANNELID,
+          DISCORD_REGISTRATION_CHANNEL_ID,
           MM_AUTH_URL,
           EXPRESS_SERVER_PORT,
         },

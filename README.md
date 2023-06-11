@@ -17,9 +17,6 @@
 ###### Discord Env Variables- James owns the Bot.
 
 `DISCORD_BOT_TOKEN=<Bot Token in https://discord.com/developers/applications/1105977548342571008/bot>`
-`DISCORD_CLIENT_ID=<Discord Client ID in https://discord.com/developers/applications/1105977548342571008/oauth2/general>`
-`DISCORD_CLIENT_SECRET=<Discord Client Secret in https://discord.com/developers/applications/1105977548342571008/oauth2/general> `
-`DISCORD_DEFAULT_CHANNELID=<The channel id that users will be redirected to after authentication- currently Members General channel is - 860931341562544139/860931344586899460>`
 
 ###### App Specific Environment Variables
 
