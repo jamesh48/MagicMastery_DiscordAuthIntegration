@@ -47,7 +47,7 @@ app.post('/acmpActivate', jsonParser, async (req, res) => {
     return sendResponse({
       res,
       statusCode: 400,
-      responseBody: { error: 'Please include a valid emeail' },
+      responseBody: { error: 'Please include a valid email' },
     });
   }
 
@@ -121,21 +121,32 @@ app.post('/acmpActivate', jsonParser, async (req, res) => {
     }
   }
 
-  await acmpReq({
-    method: 'PUT',
-    endpoint: `contacts/${id}`,
-    dataOrParams: {
-      contact: {
-        fieldValues: [{ field: discordIdFieldId, value: discordId }],
+  try {
+    await acmpReq({
+      method: 'PUT',
+      endpoint: `contacts/${id}`,
+      dataOrParams: {
+        contact: {
+          fieldValues: [{ field: discordIdFieldId, value: discordId }],
+        },
       },
-    },
-  });
+    });
 
-  return sendResponse({
-    res,
-    statusCode: 200,
-    responseBody: { message: 'ok' },
-  });
+    return sendResponse({
+      res,
+      statusCode: 200,
+      responseBody: { message: 'Thank you' },
+    });
+  } catch (err) {
+    return sendResponse({
+      res,
+      statusCode: 500,
+      responseBody: {
+        error:
+          'Your registration did not work as expected, please try again but if the error persists- contact an Admin.',
+      },
+    });
+  }
 });
 
 export default app;

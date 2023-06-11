@@ -46,7 +46,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   const emailTextInput = new TextInputBuilder()
     .setCustomId(emailTextInputCustomId)
-    .setLabel('What is the email you registered with?')
+    .setLabel('Enter your Magic Mastery Account Email')
     .setStyle(TextInputStyle.Short)
     .setPlaceholder('')
     .setRequired(true);
@@ -102,7 +102,7 @@ client.on('ready', async (c) => {
     new ButtonBuilder()
       .setCustomId(registerMeButtonCustomId)
       .setStyle(ButtonStyle.Primary)
-      .setLabel('Register Me')
+      .setLabel('Gain Access')
   );
 
   if (registrationChannel && registrationChannel.isTextBased()) {
@@ -124,6 +124,8 @@ client.on('ready', async (c) => {
 
     await registrationChannel.send({
       components: [button],
+      content:
+        'To gain access to the private Magic Mastery channels click the "Gain Access" button and enter the email associated with your Magic Mastery account.',
     });
   }
 });
