@@ -9,7 +9,6 @@ import { MmIacStackProps } from '../lib/types';
 
 const app = new cdk.App();
 
-console.info(process.env.CDK_DEFAULT_ACCOUNT);
 if (process.env.CDK_DEFAULT_ACCOUNT !== '036663905174') {
   throw new Error('Invalid Account');
 }
@@ -25,5 +24,8 @@ const mmIacStackProps: MmIacStackProps = {
     region: process.env.CDK_DEFAULT_REGION,
   },
 };
+
+cdk.Tags.of(app).add('ApplicationCI', 'mma');
+cdk.Tags.of(app).add('ApplicationRegion', process.env.CDK_DEFAULT_REGION);
 
 new MmIacStack(app, 'MmIacStack', mmIacStackProps);
