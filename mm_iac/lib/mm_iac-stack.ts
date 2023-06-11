@@ -69,6 +69,10 @@ export class MmIacStack extends cdk.Stack {
       cpu: 256,
       memoryLimitMiB: 512,
       ...(props.applyHttpsSettings ? httpsSettings : {}),
+      capacityProviderStrategies: [
+        { capacityProvider: 'FARGATE_SPOT', base: 1, weight: 100 },
+      ],
+      propagateTags: ecs.PropagatedTagSource.SERVICE,
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset('../'),
         family: 'mm-auth-family',
