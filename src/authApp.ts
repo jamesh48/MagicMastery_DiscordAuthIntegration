@@ -12,6 +12,7 @@ import {
   assignBadge,
   removeBadgesFromTags,
   dgAcmpReq,
+  fetchContactTags,
 } from './utilities';
 
 const app = express();
@@ -56,24 +57,7 @@ app.post('/dgmagic/newMemberAssignBadges', jsonParser, async (req, res) => {
 
     const [{ id }] = contacts;
 
-    const response = await dgAcmpReq({
-      method: 'GET',
-      endpoint: `contacts/${id}/contactTags`,
-      dataOrParams: {},
-    });
-
-    const fetchedContactTags = await Promise.all(
-      response.contactTags.map((contactTag: { id: string }) => {
-        return new Promise(async (resolve) => {
-          const contactTagResp = await dgAcmpReq({
-            method: 'GET',
-            endpoint: `contactTags/${contactTag.id}/tag`,
-            dataOrParams: {},
-          });
-          resolve(contactTagResp.tag.tag);
-        });
-      })
-    );
+    const fetchedContactTags = await fetchContactTags(id, true);
 
     const joinedContactTags = fetchedContactTags.join(', ');
 
@@ -200,6 +184,18 @@ app.post('/acmpActivate', jsonParser, async (req, res) => {
   }
 
   const [{ id }] = contacts;
+
+  const contactTags = await fetchContactTags(id, false);
+
+  if (contactTags.indexOf('MM Member') !== -1) {
+    return sendResponse({
+      res,
+      statusCode: 404,
+      responseBody: {
+        error: 'Email not found',
+      },
+    });
+  }
 
   const { fields } = await acmpReq({
     method: 'GET',

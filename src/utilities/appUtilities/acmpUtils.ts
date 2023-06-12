@@ -41,3 +41,52 @@ export const acmpReq = async (reqConfig: {
   });
   return data;
 };
+
+export const fetchContactTags = async (
+  contactId: string,
+  dg: boolean
+): Promise<string[]> => {
+  if (dg) {
+    const { contactTags } = await dgAcmpReq({
+      method: 'GET',
+      endpoint: `contacts/${contactId}/contactTags`,
+      dataOrParams: {},
+    });
+
+    const fetchedContactTags = await Promise.all(
+      contactTags.map((contactTag: { id: string }) => {
+        return new Promise(async (resolve) => {
+          const contactTagResp = await dgAcmpReq({
+            method: 'GET',
+            endpoint: `contactTags/${contactTag.id}/tag`,
+            dataOrParams: {},
+          });
+          resolve(contactTagResp.tag.tag);
+        });
+      })
+    );
+
+    return fetchedContactTags;
+  } else {
+    const { contactTags } = await acmpReq({
+      method: 'GET',
+      endpoint: `contacts/${contactId}/contactTags`,
+      dataOrParams: {},
+    });
+
+    const fetchedContactTags = await Promise.all(
+      contactTags.map((contactTag: { id: string }) => {
+        return new Promise(async (resolve) => {
+          const contactTagResp = await acmpReq({
+            method: 'GET',
+            endpoint: `contactTags/${contactTag.id}/tag`,
+            dataOrParams: {},
+          });
+          resolve(contactTagResp.tag.tag);
+        });
+      })
+    );
+
+    return fetchedContactTags;
+  }
+};
