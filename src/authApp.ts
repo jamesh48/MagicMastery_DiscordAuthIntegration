@@ -26,6 +26,7 @@ app.get('/healthcheck', async (_req, res) => {
   });
 });
 
+/* Backwards Compatible Api Route */
 app.post('/dgmagic/assignBadge', jsonParser, async (req, res) => {
   try {
     await assignBadge(req.body.data.email);
