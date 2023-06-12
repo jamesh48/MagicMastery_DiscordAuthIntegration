@@ -46,7 +46,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   const emailTextInput = new TextInputBuilder()
     .setCustomId(emailTextInputCustomId)
-    .setLabel('Enter your Magic Mastery Account Email')
+    .setLabel('Please enter your Magic Mastery Account Email')
     .setStyle(TextInputStyle.Short)
     .setPlaceholder('')
     .setRequired(true);
@@ -117,6 +117,7 @@ client.on('ready', async (c) => {
           firstMessageButtonCustomId === registerMeButtonCustomId;
 
         if (buttonAlreadyExists) {
+          console.info('Gain Access Button Already Exists');
           return;
         }
       }

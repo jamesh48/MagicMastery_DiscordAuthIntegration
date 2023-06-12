@@ -5,6 +5,8 @@ declare global {
       ACM_CERTIFICATE_ARN: string;
       ACTIVE_CAMPAIGN_API_TOKEN: string;
       ACTIVE_CAMPAIGN_BASEURL: string;
+      DG_ACTIVE_CAMPAIGN_BASEURL: string;
+      DG_ACTIVE_CAMPAIGN_API_TOKEN: string;
       DISCORD_BOT_TOKEN: string;
       DISCORD_REGISTRATION_CHANNEL_ID: string;
       MM_AUTH_URL: string;

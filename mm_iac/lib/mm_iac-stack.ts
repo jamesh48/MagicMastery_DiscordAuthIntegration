@@ -39,8 +39,12 @@ export class MmIacStack extends cdk.Stack {
       ACTIVE_CAMPAIGN_BASEURL,
       DISCORD_BOT_TOKEN,
       DISCORD_REGISTRATION_CHANNEL_ID,
+      DG_ACTIVE_CAMPAIGN_BASEURL,
+      DG_ACTIVE_CAMPAIGN_API_TOKEN,
       EXPRESS_SERVER_PORT,
       MM_AUTH_URL,
+      WIX_API_KEY,
+      WIX_WEBSITE_NAME,
     } = this.getDefinedEnvVariables();
 
     const httpsSettings = {
@@ -81,10 +85,14 @@ export class MmIacStack extends cdk.Stack {
         environment: {
           ACTIVE_CAMPAIGN_API_TOKEN,
           ACTIVE_CAMPAIGN_BASEURL,
+          DG_ACTIVE_CAMPAIGN_BASEURL,
+          DG_ACTIVE_CAMPAIGN_API_TOKEN,
           DISCORD_BOT_TOKEN,
           DISCORD_REGISTRATION_CHANNEL_ID,
           MM_AUTH_URL,
           EXPRESS_SERVER_PORT,
+          WIX_API_KEY,
+          WIX_WEBSITE_NAME,
         },
       },
     });

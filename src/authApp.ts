@@ -8,10 +8,15 @@ import {
   acmpReq,
   validateEmail,
   sendResponse,
+  assignBadgesFromTags,
+  assignBadge,
+  removeBadgesFromTags,
+  dgAcmpReq,
 } from './utilities';
 
 const app = express();
 const jsonParser = bodyParser.json();
+const urlEncodedParser = bodyParser.urlencoded({ extended: true });
 
 app.get('/healthcheck', async (_req, res) => {
   return sendResponse({
@@ -19,6 +24,111 @@ app.get('/healthcheck', async (_req, res) => {
     statusCode: 200,
     responseBody: { message: 'App is Healthy!' },
   });
+});
+
+app.post('/dgmagic/assignBadge', jsonParser, async (req, res) => {
+  try {
+    await assignBadge(req.body.data.email);
+    return sendResponse({
+      res,
+      statusCode: 200,
+      responseBody: { message: 'ok' },
+    });
+  } catch (err) {
+    return sendResponse({
+      res,
+      statusCode: 500,
+      responseBody: { error: 'error' },
+    });
+  }
+});
+
+app.post('/dgmagic/newMemberAssignBadges', jsonParser, async (req, res) => {
+  console.info(req.body);
+  try {
+    const { email } = req.body.data;
+    const { contacts } = await dgAcmpReq({
+      method: 'GET',
+      dataOrParams: { email },
+      endpoint: 'contacts',
+    });
+
+    const [{ id }] = contacts;
+
+    const response = await dgAcmpReq({
+      method: 'GET',
+      endpoint: `contacts/${id}/contactTags`,
+      dataOrParams: {},
+    });
+
+    const fetchedContactTags = await Promise.all(
+      response.contactTags.map((contactTag: { id: string }) => {
+        return new Promise(async (resolve) => {
+          const contactTagResp = await dgAcmpReq({
+            method: 'GET',
+            endpoint: `contactTags/${contactTag.id}/tag`,
+            dataOrParams: {},
+          });
+          resolve(contactTagResp.tag.tag);
+        });
+      })
+    );
+
+    const joinedContactTags = fetchedContactTags.join(', ');
+
+    console.info(joinedContactTags, '->', email);
+    await assignBadgesFromTags(joinedContactTags, email);
+
+    return sendResponse({
+      res,
+      statusCode: 200,
+      responseBody: { message: 'ok' },
+    });
+  } catch (err) {
+    console.info(err.message);
+    return sendResponse({
+      res,
+      statusCode: 500,
+      responseBody: { error: 'error' },
+    });
+  }
+});
+
+app.post('/dgmagic/deleteBadgeFromTag', urlEncodedParser, async (req, res) => {
+  try {
+    const { tags, email } = req.body.contact;
+    await removeBadgesFromTags(tags, email);
+    return sendResponse({
+      res,
+      statusCode: 200,
+      responseBody: { message: 'ok' },
+    });
+  } catch (err) {
+    return sendResponse({
+      res,
+      statusCode: 500,
+      responseBody: { error: 'error' },
+    });
+  }
+});
+
+app.post('/dgmagic/assignBadgeFromTag', urlEncodedParser, async (req, res) => {
+  try {
+    console.info(req.body.contact);
+    const { tags, email } = req.body.contact;
+    await assignBadgesFromTags(tags, email);
+    return sendResponse({
+      res,
+      statusCode: 200,
+      responseBody: { message: 'ok' },
+    });
+  } catch (err) {
+    return sendResponse({
+      res,
+      statusCode: 500,
+      responseBody: { error: 'error' },
+    });
+  }
 });
 
 app.post('/acmpActivate', jsonParser, async (req, res) => {
