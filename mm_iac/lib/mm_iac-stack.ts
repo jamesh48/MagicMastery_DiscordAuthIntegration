@@ -1,11 +1,12 @@
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as cdk from 'aws-cdk-lib';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as r53 from 'aws-cdk-lib/aws-route53';
 import { Construct } from 'constructs';
-import { MMAuthALB } from '../constructs/mmApplicationLoadBalancedFargateService';
 import { EnvKeys, MmIacStackProps } from './types';
+import { ApplicationLoadBalancedEc2Service } from 'aws-cdk-lib/aws-ecs-patterns';
 
 export class MmIacStack extends cdk.Stack {
   private isDefined(variable: string | undefined): variable is string {
@@ -69,33 +70,51 @@ export class MmIacStack extends cdk.Stack {
       protocol: elbv2.ApplicationProtocol.HTTPS,
     };
 
-    const service = new MMAuthALB(this, 'mm-auth-service', {
-      cpu: 256,
-      memoryLimitMiB: 512,
-      ...(props.applyHttpsSettings ? httpsSettings : {}),
-      capacityProviderStrategies: [
-        { capacityProvider: 'FARGATE_SPOT', base: 1, weight: 100 },
-      ],
-      propagateTags: ecs.PropagatedTagSource.SERVICE,
-      taskImageOptions: {
-        image: ecs.ContainerImage.fromAsset('../'),
-        family: 'mm-auth-family',
-        containerPort: Number(process.env.EXPRESS_SERVER_PORT),
-        containerName: 'mm-auth-container',
-        environment: {
-          ACTIVE_CAMPAIGN_API_TOKEN,
-          ACTIVE_CAMPAIGN_BASEURL,
-          DG_ACTIVE_CAMPAIGN_BASEURL,
-          DG_ACTIVE_CAMPAIGN_API_TOKEN,
-          DISCORD_BOT_TOKEN,
-          DISCORD_REGISTRATION_CHANNEL_ID,
-          MM_AUTH_URL,
-          EXPRESS_SERVER_PORT,
-          WIX_API_KEY,
-          WIX_WEBSITE_NAME,
-        },
+    const cluster = new ecs.Cluster(this, 'mma-cluster', {
+      clusterName: 'mma-cluster',
+      vpc: new ec2.Vpc(this, 'MMA-Vpc', {
+        subnetConfiguration: [
+          { cidrMask: 23, name: 'Public', subnetType: ec2.SubnetType.PUBLIC },
+        ],
+      }),
+      containerInsights: true,
+      capacity: {
+        autoScalingGroupName: 'mma-asg',
+        instanceType: new ec2.InstanceType('t2.small'),
+        maxCapacity: 1,
+        minCapacity: 1,
       },
     });
+
+    const service = new ApplicationLoadBalancedEc2Service(
+      this,
+      'mma-ec2-service',
+      {
+        cpu: 512,
+        memoryLimitMiB: 1024,
+        ...(props.applyHttpsSettings ? httpsSettings : {}),
+        cluster,
+
+        taskImageOptions: {
+          image: ecs.ContainerImage.fromAsset('../'),
+          family: 'mm-auth-family',
+          containerPort: Number(process.env.EXPRESS_SERVER_PORT),
+          containerName: 'mm-auth-container',
+          environment: {
+            ACTIVE_CAMPAIGN_API_TOKEN,
+            ACTIVE_CAMPAIGN_BASEURL,
+            DG_ACTIVE_CAMPAIGN_BASEURL,
+            DG_ACTIVE_CAMPAIGN_API_TOKEN,
+            DISCORD_BOT_TOKEN,
+            DISCORD_REGISTRATION_CHANNEL_ID,
+            MM_AUTH_URL,
+            EXPRESS_SERVER_PORT,
+            WIX_API_KEY,
+            WIX_WEBSITE_NAME,
+          },
+        },
+      }
+    );
 
     service.targetGroup.configureHealthCheck({
       interval: cdk.Duration.seconds(10),
@@ -104,7 +123,7 @@ export class MmIacStack extends cdk.Stack {
       unhealthyThresholdCount: 2,
       healthyHttpCodes: '200',
       path: '/healthcheck',
-      port: process.env.EXPRESS_SERVER_PORT,
+      //   port: process.env.EXPRESS_SERVER_PORT,
       protocol: elbv2.Protocol.HTTP,
     });
   }

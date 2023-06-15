@@ -142,7 +142,7 @@ export interface MMApplicationLoadBalancedFargateServiceProps
    */
   readonly healthCheck?: elbv2.HealthCheck;
 }
-export class MMAuthALB extends ecsPatterns.ApplicationLoadBalancedFargateService {
+export class MMAuthFargateALB extends ecsPatterns.ApplicationLoadBalancedFargateService {
   /**
    * Creates a new MMApplicationLoadBalancedFargateService
    *
