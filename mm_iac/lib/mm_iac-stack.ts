@@ -79,7 +79,7 @@ export class MmIacStack extends cdk.Stack {
       }),
       containerInsights: true,
       capacity: {
-        autoScalingGroupName: 'mma-asg',
+        // autoScalingGroupName: 'mma-asg',
         instanceType: new ec2.InstanceType('t2.small'),
         maxCapacity: 1,
         minCapacity: 1,
