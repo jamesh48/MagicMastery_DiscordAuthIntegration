@@ -79,7 +79,7 @@ export class MmIacStack extends cdk.Stack {
       }),
       containerInsights: true,
       capacity: {
-        // autoScalingGroupName: 'mma-asg',
+        // autoScalingGroupName is not specified since it causes the stack to rollback due to duplicate resource error
         instanceType: new ec2.InstanceType('t2.small'),
         maxCapacity: 1,
         minCapacity: 1,
@@ -123,8 +123,8 @@ export class MmIacStack extends cdk.Stack {
       unhealthyThresholdCount: 2,
       healthyHttpCodes: '200',
       path: '/healthcheck',
-      //   port: process.env.EXPRESS_SERVER_PORT,
       protocol: elbv2.Protocol.HTTP,
+      // port is not specified
     });
   }
 }
