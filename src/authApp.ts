@@ -187,7 +187,7 @@ app.post('/acmpActivate', jsonParser, async (req, res) => {
 
   const contactTags = await fetchContactTags(id, false);
 
-  if (contactTags.indexOf('MM Member') !== -1) {
+  if (contactTags.indexOf('MM Member') === -1) {
     return sendResponse({
       res,
       statusCode: 404,

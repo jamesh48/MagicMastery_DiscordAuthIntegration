@@ -7,6 +7,7 @@ export const dgAcmpReq = async (reqConfig: {
 }) => {
   const acmpBaseUrl = process.env.DG_ACTIVE_CAMPAIGN_BASEURL;
   const acmpApiToken = process.env.DG_ACTIVE_CAMPAIGN_API_TOKEN;
+
   const { data } = await axios({
     url: `${acmpBaseUrl}/${reqConfig.endpoint}`,
     ...(reqConfig.method === 'GET' ? { params: reqConfig.dataOrParams } : {}),
@@ -89,4 +90,49 @@ export const fetchContactTags = async (
 
     return fetchedContactTags;
   }
+};
+
+export const fetchAllMagicMasteryACMPContacts = async () => {
+  const recurseMMTagContacts = async (input: {
+    tagid: number;
+    limit: number;
+    offset: number;
+    result: { email: string }[];
+    count: number;
+  }) => {
+    const pageResults = await dgAcmpReq({
+      method: 'GET',
+      endpoint: '/contacts',
+      dataOrParams: {
+        tagid: input.tagid,
+        limit: input.limit,
+        offset: input.offset,
+      },
+    });
+
+    if (pageResults.contacts.length < 100) {
+      return input.result.concat(pageResults.contacts);
+    }
+
+    const recursedResult = (await recurseMMTagContacts({
+      tagid: input.tagid,
+      limit: input.limit,
+      offset: input.offset + input.limit,
+      result: input.result.concat(pageResults.contacts),
+      count: input.count + 1,
+    })) as { email: string }[];
+
+    return recursedResult;
+  };
+
+  const mmMembers = await recurseMMTagContacts({
+    tagid: 10,
+    limit: 100,
+    offset: 0,
+    result: [],
+    count: 0,
+  });
+
+  console.info(`${mmMembers.length} Magic Mastery Members`);
+  return mmMembers;
 };
